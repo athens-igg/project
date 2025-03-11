@@ -46,11 +46,16 @@ app.use("/api/trips", tripRoutes);
 const feedbackRoutes = require("./routes/feedbackRoutes");
 app.use("/api/feedback", feedbackRoutes);
 
+
 const galleryRoutes = require("./routes/galleryRoutes");
 app.use("/api/gallery", galleryRoutes);
 
 // Serve images from the "uploads" folder
 app.use("/uploads", express.static("uploads"));
+
+app.get("/api/destinations", (req, res) => {
+  res.json({ message: "Destinations API is working!" });
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000;

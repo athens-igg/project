@@ -1,37 +1,45 @@
 const Feedback = require("../models/feedbackModel");
 
-// Create feedback
+// ✅ Submit feedback for website (No tripId)
 const createFeedback = async (req, res) => {
     try {
-        const { trip, rating, comment } = req.body;
+        const { rating, comment } = req.body;
+
+        if (!rating || !comment) {
+            return res.status(400).json({ message: "Rating and comment are required." });
+        }
+
         const feedback = await Feedback.create({
-            trip,
-            user: req.user._id, // User must be logged in
+            user: req.user._id,
+            name: req.user.name,  // ✅ Store username for display
             rating,
             comment,
         });
+
         res.status(201).json(feedback);
     } catch (error) {
         res.status(500).json({ message: "Failed to submit feedback" });
     }
 };
 
-// Get feedback for a trip
-const getFeedbackForTrip = async (req, res) => {
+// ✅ Fetch all feedback (Website Reviews)
+const getAllFeedback = async (req, res) => {
     try {
-        const feedback = await Feedback.find({ trip: req.params.tripId }).populate("user", "name");
+        const feedback = await Feedback.find().sort({ createdAt: -1 }); // Latest first
         res.json(feedback);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch feedback" });
     }
 };
 
-// Delete feedback (Only by the user who created it)
+// ✅ Delete feedback (Only the user who created it)
 const deleteFeedback = async (req, res) => {
     try {
         const feedback = await Feedback.findById(req.params.id);
+        
         if (!feedback) return res.status(404).json({ message: "Feedback not found" });
 
+        // ✅ Ensure the logged-in user is the one who created the feedback
         if (feedback.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Not authorized to delete this feedback" });
         }
@@ -43,4 +51,5 @@ const deleteFeedback = async (req, res) => {
     }
 };
 
-module.exports = { createFeedback, getFeedbackForTrip, deleteFeedback };
+// ✅ Ensure `deleteFeedback` is exported properly
+module.exports = { createFeedback, getAllFeedback, deleteFeedback }; 
