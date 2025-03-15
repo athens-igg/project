@@ -49,9 +49,7 @@ app.use("/api/feedback", feedbackRoutes);
 
 const galleryRoutes = require("./routes/galleryRoutes");
 app.use("/api/gallery", galleryRoutes);
-
-// Serve images from the "uploads" folder
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads")); // Serve uploaded images
 
 app.get("/api/destinations", (req, res) => {
   res.json({ message: "Destinations API is working!" });
