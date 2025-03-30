@@ -10,42 +10,23 @@ const { updateTrip } = require("../controllers/tripController");
 const { deleteTrip } = require("../controllers/tripController");
 const { generateItinerary } = require("../controllers/itineraryController");
 const { getUserItineraries } = require("../controllers/itineraryController");
-const { getTripItinerary } = require("../controllers/tripController"); // ✅ Import function
+const { getTripItinerary } = require("../controllers/tripController"); //   Import function
 
 // @desc    Create a trip
 // @route   POST /api/trips
 // @access  Private
 
-// ✅ CRUD operations for trips
-router.post("/", protect, createTrip);
-router.get("/", protect, getTrips);
-router.put("/:id", protect, updateTrip);
-router.delete("/:id", protect, deleteTrip);
+//   CRUD operations for trips
+router.post("/", protect, createTrip);  //   Create trip
+router.get("/", protect, getTrips);     //   Get all trips
+router.put("/:id", protect, updateTrip); //   Update trip
+router.delete("/:id", protect, deleteTrip); //   Delete trip
 
-// ✅ Itinerary Generation
-router.post("/generate-itinerary", protect, generateItinerary);
-router.get("/user", protect, getUserItineraries);
-router.get("/:id/itinerary", protect, getTripItinerary);
-router.post("/:id/generate-itinerary", protect, generateItinerary);
+//   Itinerary Routes
+router.get("/user", protect, getUserItineraries); // Get all user itineraries
+router.get("/:id/itinerary", protect, getTripItinerary); // Get itinerary for a specific trip
+router.post("/:id/generate-itinerary", protect, generateItinerary); //   Generate itinerary for a trip
 
-router.post("/", protect, async (req, res) => {
-  try {
-    const { destination, startDate, endDate, tripType, interests, itinerary } = req.body;
-    const trip = new Trip({
-      user: req.user._id,
-      destination,
-      startDate,
-      endDate,
-      tripType,
-      interests,
-      itinerary,
-    });
-    await trip.save();
-    res.status(201).json(trip);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to create trip" });
-  }
-});
 
 // @desc    Get all trips for a user
 // @route   GET /api/trips

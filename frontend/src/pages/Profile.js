@@ -25,7 +25,7 @@ const Profile = () => {
                 <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
                 {user ? (
                   <>
-                  <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/* ✅ Show Profile if logged in */}
+                  <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/*   Show Profile if logged in */}
                   <Button variant="outline-danger" onClick={logout} className="ms-2">
                     Logout
                   </Button>

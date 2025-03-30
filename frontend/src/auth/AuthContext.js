@@ -1,12 +1,12 @@
 import { createContext, useState, useContext } from "react";
-import axios from "axios"; // ✅ Import axios for API calls
+import axios from "axios"; //   Import axios for API calls
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || null);
 
-  // ✅ Register function
+  //   Register function
   const register = async (name, email, password) => {
     try {
       const response = await axios.post("http://localhost:5000/api/users/register", {
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}> {/* ✅ Added register */}
+    <AuthContext.Provider value={{ user, login, logout, register }}> {/*   Added register */}
       {children}
     </AuthContext.Provider>
   );

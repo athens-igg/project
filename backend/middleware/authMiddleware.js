@@ -9,13 +9,13 @@ const protect = asyncHandler(async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      console.log("🔑 Received Token in Backend:", token); // ✅ Debugging log
+      console.log("🔑 Received Token in Backend:", token); //   Debugging log
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("🔍 Decoded Token:", decoded); // ✅ Debugging log
+      console.log("🔍 Decoded Token:", decoded); //   Debugging log
 
       req.user = await User.findById(decoded.id).select("-password");
-      console.log("✅ Authenticated User:", req.user); // ✅ Debugging log
+      console.log("  Authenticated User:", req.user); //   Debugging log
       next(); // Proceed to protected route
     } catch (error) {
       console.error("Authorization error:", error.message);

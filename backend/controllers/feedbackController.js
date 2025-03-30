@@ -1,6 +1,6 @@
 const Feedback = require("../models/feedbackModel");
 
-// ✅ Submit feedback for website (No tripId)
+//   Submit feedback for website (No tripId)
 const createFeedback = async (req, res) => {
     try {
         const { rating, comment } = req.body;
@@ -11,7 +11,7 @@ const createFeedback = async (req, res) => {
 
         const feedback = await Feedback.create({
             user: req.user._id,
-            name: req.user.name,  // ✅ Store username for display
+            name: req.user.name,  //   Store username for display
             rating,
             comment,
         });
@@ -22,7 +22,7 @@ const createFeedback = async (req, res) => {
     }
 };
 
-// ✅ Fetch all feedback (Website Reviews)
+//   Fetch all feedback (Website Reviews)
 const getAllFeedback = async (req, res) => {
     try {
         const feedback = await Feedback.find().sort({ createdAt: -1 }); // Latest first
@@ -32,14 +32,14 @@ const getAllFeedback = async (req, res) => {
     }
 };
 
-// ✅ Delete feedback (Only the user who created it)
+//   Delete feedback (Only the user who created it)
 const deleteFeedback = async (req, res) => {
     try {
         const feedback = await Feedback.findById(req.params.id);
         
         if (!feedback) return res.status(404).json({ message: "Feedback not found" });
 
-        // ✅ Ensure the logged-in user is the one who created the feedback
+        //   Ensure the logged-in user is the one who created the feedback
         if (feedback.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Not authorized to delete this feedback" });
         }
@@ -51,5 +51,5 @@ const deleteFeedback = async (req, res) => {
     }
 };
 
-// ✅ Ensure `deleteFeedback` is exported properly
+//   Ensure `deleteFeedback` is exported properly
 module.exports = { createFeedback, getAllFeedback, deleteFeedback }; 

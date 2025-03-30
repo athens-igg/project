@@ -1,0 +1,114 @@
+/* ---- CONTAINER STYLES ---- */
+.trip-planner-container {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  background-image: url('https://www.adventuretravelcoach.com/wp-content/uploads/2020/06/68AFCE60-6D7A-40C0-BD33-497926A30147.jpeg');
+}
+
+/* ---- HEADER STYLES ---- */
+.trip-planner-container h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 20px;
+}
+
+/* ---- FORM STYLES ---- */
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ---- LABELS ---- */
+.trip-form label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3436;
+  text-align: left;
+  display: block;
+  font-style: bold;
+}
+
+/* ---- INPUT FIELDS ---- */
+.trip-form input, 
+.trip-form select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.trip-form input:focus,
+.trip-form select:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
+  background: white;
+}
+
+.interests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust column width */
+  gap: 10px;
+}
+
+.interests-grid label {
+  display: flex;
+  align-items: center;
+  justify-content: start; /* Align text and checkbox properly */
+  gap: 8px;
+  font-size: 1rem;
+  color: #2d3436;
+}
+
+.interests-grid input {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+
+/* ---- SUBMIT BUTTON ---- */
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #4CAF50, #2E8B57);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
+/* ---- LOADING BUTTON ---- */
+.submit-button:disabled {
+  background: gray;
+  cursor: not-allowed;
+}
+
+/* ---- RESPONSIVE DESIGN ---- */
+@media (max-width: 768px) {
+  .trip-planner-container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .interests-grid {
+    grid-template-columns: 1fr;
+  }
+}

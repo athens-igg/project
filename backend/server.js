@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json()); // Parses incoming JSON requests
 
 // Debugging: Check if API Key is loaded
-console.log("API Key Loaded:", process.env.OPENTRIPMAP_API_KEY ? "✅ Yes" : "❌ No");
+console.log("API Key Loaded:", process.env.OPENTRIPMAP_API_KEY ? "  Yes" : "❌ No");
 
 // Simple Test Route
 app.get("/", (req, res) => {
@@ -27,7 +27,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("✅ MongoDB Connected Successfully!"))
+  .then(() => console.log("  MongoDB Connected Successfully!"))
   .catch((error) => {
     console.error("❌ MongoDB Connection Error:", error.message);
     process.exit(1); // Stop the server if DB connection fails

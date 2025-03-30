@@ -69,14 +69,16 @@ const getTripItinerary = async (req, res) => {
         }
 
         if (!trip.itinerary) {
-            return res.status(404).json({ message: "No itinerary found for this trip" });
+            return res.status(404).json({ message: "Itinerary not available" });
         }
 
         res.json(trip.itinerary);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching itinerary." });
+        console.error("Error fetching itinerary:", error);
+        res.status(500).json({ message: "Failed to fetch itinerary" });
     }
 };
+
 /**
  * Sort places by distance from the first place
  */
@@ -132,7 +134,7 @@ const structureItinerary = (places, startDate, numDays) => {
 
     return itinerary;
 };
-// ✅ Fetch itineraries for the logged-in user
+//   Fetch itineraries for the logged-in user
 const getUserItineraries = async (req, res) => {
     try {
         const itineraries = await Trip.find({ user: req.user._id });
