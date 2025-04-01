@@ -24,8 +24,14 @@ router.delete("/:id", protect, deleteTrip); //   Delete trip
 
 //   Itinerary Routes
 router.get("/user", protect, getUserItineraries); // Get all user itineraries
-router.get("/:id/itinerary", protect, getTripItinerary); // Get itinerary for a specific trip
+router.get("/itinerary/:id", protect, getTripItinerary); // Get itinerary for a specific trip
 router.post("/:id/generate-itinerary", protect, generateItinerary); //   Generate itinerary for a trip
+const { createItineraryFromTrip } = require("../controllers/itineraryController");
+
+// Define the route that triggers fetching the trip and posting the itinerary
+router.post("/:id/itinerary/generate", protect, createItineraryFromTrip);
+router.get("/:id/itinerary/generate", protect, createItineraryFromTrip);
+router.post('/trips/:tripId/itinerary', createItineraryFromTrip);
 
 
 // @desc    Get all trips for a user

@@ -17,7 +17,7 @@ export default function TripPlanner() {
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const interestOptions = ["Foods", "Nature", "Culture", "Adventure", "Shopping"];
+  const interestOptions = ["Foods", "Nature", "Religion", "Adventure", "Shopping"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,15 +33,23 @@ export default function TripPlanner() {
 
     try {
       const response = await axios.post("http://localhost:5000/api/trips", tripData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      navigate(`/itinerary/${response.data._id}`);
-    } catch (error) {
+  
+      // After creating the trip, get the itinerary ID from the backend
+      const itineraryResponse = await axios.get(`http://localhost:5000/api/trips/${response.data._id}/itinerary/generate`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+  
+      // Use the itinerary ID to navigate to the itinerary page
+      navigate(`/itinerary/${itineraryResponse.data.itineraryId}`);
+  } catch (error) {
       console.error("Error creating trip:", error);
       alert("Failed to create trip. Please try again.");
-    } finally {
+  } finally {
       setLoading(false);
-    }
+  }
+  
   };
 
   return (

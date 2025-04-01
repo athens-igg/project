@@ -43,6 +43,7 @@ app.use("/api/destinations", destinationRoutes);
 const tripRoutes = require("./routes/tripRoutes");
 app.use("/api/trips", tripRoutes);
 
+
 const feedbackRoutes = require("./routes/feedbackRoutes");
 app.use("/api/feedback", feedbackRoutes);
 

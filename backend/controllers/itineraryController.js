@@ -1,6 +1,9 @@
 const { getDestinationCoordinates, fetchPlaces } = require("../services/openTripMapService");
 const Itinerary = require("../models/Itinerary");
 const Trip = require("../models/tripModel");
+const axios = require("axios");  // ✅ Import axios
+const mongoose = require("mongoose"); // ✅ Add this
+
 
 
 /**
@@ -8,74 +11,112 @@ const Trip = require("../models/tripModel");
  */
 const generateItinerary = async (req, res) => {
     try {
-        const { destination, interests, startDate, endDate } = req.body;
-        const userId = req.user.id; // Ensure user is authenticated
+        const { tripId } = req.params; // Get the tripId from the URL params
+        const trip = await Trip.findById(tripId); // Find the trip based on the tripId
 
-        // Convert dates to objects and calculate days
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const numDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+        if (!trip) {
+            return res.status(404).json({ message: "Trip not found" });
+        }
 
-        console.log(`Trip Duration: ${numDays} days`);
+        // Generate the itinerary here
+        const newItinerary = new Itinerary({
+            trip: trip._id,
+            destination: trip.destination,
+            // Add any other relevant fields here
+        });
 
-        // Get destination coordinates
+        await newItinerary.save(); // Save the new itinerary to the database
+
+        // Respond with the Itinerary ID
+        res.status(200).json({ itineraryId: newItinerary._id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
+// Get Itinerary for a Specific Trip
+/*const getTripItinerary = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized - Please log in" });
+        }
+        const { id } = req.params;  // Get itinerary ID from URL
+        const itinerary = await Itinerary.findById(id);
+
+        if (!itinerary) {
+            return res.status(404).json({ message: "Itinerary not found" });
+        }
+
+        res.status(200).json(itinerary);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};*/
+const createItineraryFromTrip = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const tripId = new mongoose.Types.ObjectId(id);  // ✅ Ensure tripId is an ObjectId
+
+        console.log(`Creating itinerary for tripId: ${tripId}`);
+
+        const trip = await Trip.findById(tripId);
+        if (!trip) {
+            return res.status(404).json({ message: "Trip not found" });
+        }
+
+        const { destination, startDate, endDate, interests } = trip;
+        if (!destination || !startDate || !endDate) {
+            return res.status(400).json({ message: "Trip details are incomplete." });
+        }
+
+        // Ensure the user is authenticated
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: No user found." });
+        }
+
+        // Get coordinates
         const locationData = await getDestinationCoordinates(destination);
         if (!locationData.lat || !locationData.lon) {
-            return res.status(400).json({ message: "Invalid destination or coordinates not found." });
+            return res.status(400).json({ message: "Invalid destination." });
         }
-        const { lat, lon } = locationData;
 
+        const { lat, lon } = locationData;
         console.log("Fetching places for:", { lat, lon, interests });
 
-        // Fetch places from OpenTripMap API
+        // Fetch places based on interests
         let places = await fetchPlaces(lat, lon, interests);
-
-        if (places.length < numDays * 5) {
-            return res.status(404).json({ message: "Not enough places found for a balanced itinerary." });
+        if (places.length < 5) {
+            return res.status(404).json({ message: "Not enough places found." });
         }
 
-        console.log(`Total Places Found: ${places.length}`);
-
-        // Distribute places across days (5 per day)
+        // Structure the itinerary
+        const numDays = Math.max(1, Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)));
         const itinerary = {};
         for (let i = 0; i < numDays; i++) {
             itinerary[`Day ${i + 1}`] = places.splice(0, 5);
         }
 
-        // **Save itinerary in MongoDB**
+        // Save itinerary
         const savedItinerary = new Itinerary({
-            user: userId,
+            user: new mongoose.Types.ObjectId(userId), // ✅ Ensure ObjectId
+            trip: tripId, // ✅ Now stored correctly as ObjectId
             destination,
             startDate,
             endDate,
             days: itinerary,
         });
-
         await savedItinerary.save();
 
-        res.status(201).json(savedItinerary);
+        // Step 1: Return the Itinerary ID after saving the itinerary
+        res.status(201).json({ itineraryId: savedItinerary._id });  // Returning the itinerary ID
     } catch (error) {
-        console.error("Itinerary generation error:", error.message);
-        res.status(500).json({ message: "Error generating itinerary." });
-    }
-};
-
-
-const getTripItinerary = async (req, res) => {
-    try {
-        const trip = await Trip.findById(req.params.id);
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
-        }
-
-        if (!trip.itinerary) {
-            return res.status(404).json({ message: "Itinerary not available" });
-        }
-
-        res.json(trip.itinerary);
-    } catch (error) {
-        console.error("Error fetching itinerary:", error);
-        res.status(500).json({ message: "Failed to fetch itinerary" });
+        console.error("Error creating itinerary:", error);
+        res.status(500).json({ message: "Failed to create itinerary." });
     }
 };
 
@@ -163,4 +204,4 @@ function generateItinerarySummary(places, numDays) {
     return summary;
 }
 
-module.exports = { generateItinerary, getUserItineraries,getTripItinerary };
+module.exports = { generateItinerary, getUserItineraries,createItineraryFromTrip };

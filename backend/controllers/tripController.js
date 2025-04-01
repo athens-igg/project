@@ -1,4 +1,5 @@
 const Trip = require("../models/tripModel");
+const Itinerary = require("../models/Itinerary"); 
 
 // @desc    Create a new trip
 // @route   POST /api/trips
@@ -103,16 +104,21 @@ const updateTrip = async (req, res) => {
       res.status(500).json({ message: "Error deleting trip", error });
     }
   };
-  const getTripItinerary = async (req, res) => {
+  // Get Itinerary for a Specific Trip
+const getTripItinerary = async (req, res) => {
     try {
-        const trip = await Trip.findById(req.params.id);
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
+        const { id } = req.params;  // Get itinerary ID from URL
+        const itinerary = await Itinerary.findById(id);
+        
+        if (!itinerary) {
+            return res.status(404).json({ message: "Itinerary not found" });
         }
-        res.json(trip.itinerary);
+
+        res.status(200).json(itinerary);
     } catch (error) {
-        res.status(500).json({ message: "Failed to fetch itinerary" });
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
     }
 };
-  
+
   module.exports = { getTrips, createTrip, updateTrip, deleteTrip, getTripItinerary };
