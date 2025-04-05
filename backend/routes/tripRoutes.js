@@ -1,36 +1,39 @@
-// tripRoutes.js (Express Routes)
 const express = require("express");
 const router = express.Router();
 const Trip = require("../models/tripModel");
 
-const { createTrip } = require("../controllers/tripController"); 
-const { protect } = require("../middleware/authMiddleware");
-const { getTrips } = require("../controllers/tripController");
-const { updateTrip } = require("../controllers/tripController");
-const { deleteTrip } = require("../controllers/tripController");
-const { generateItinerary } = require("../controllers/itineraryController");
-const { getUserItineraries } = require("../controllers/itineraryController");
-const { getTripItinerary } = require("../controllers/tripController"); // ✅ Import function
+const {
+  createTrip,
+  getTrips,
+  updateTrip,
+  deleteTrip,
+  getTripItinerary,
+} = require("../controllers/tripController");
+const {
+  generateItinerary,
+  getUserItineraries,
+} = require("../controllers/itineraryController");
+const authMiddleware = require("../middleware/authMiddleware"); // Correct import
 
 // @desc    Create a trip
 // @route   POST /api/trips
 // @access  Private
+router.post("/", authMiddleware, createTrip);
+router.get("/", authMiddleware, getTrips);
+router.put("/:id", authMiddleware, updateTrip);
+router.delete("/:id", authMiddleware, deleteTrip);
 
-// ✅ CRUD operations for trips
-router.post("/", protect, createTrip);
-router.get("/", protect, getTrips);
-router.put("/:id", protect, updateTrip);
-router.delete("/:id", protect, deleteTrip);
+// @desc    Itinerary Generation
+router.post("/generate-itinerary", authMiddleware, generateItinerary);
+router.get("/user", authMiddleware, getUserItineraries);
+router.get("/:id/itinerary", authMiddleware, getTripItinerary);
+router.post("/:id/generate-itinerary", authMiddleware, generateItinerary);
 
-// ✅ Itinerary Generation
-router.post("/generate-itinerary", protect, generateItinerary);
-router.get("/user", protect, getUserItineraries);
-router.get("/:id/itinerary", protect, getTripItinerary);
-router.post("/:id/generate-itinerary", protect, generateItinerary);
-
-router.post("/", protect, async (req, res) => {
+// Additional CRUD operations with authMiddleware applied
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { destination, startDate, endDate, tripType, interests, itinerary } = req.body;
+    const { destination, startDate, endDate, tripType, interests, itinerary } =
+      req.body;
     const trip = new Trip({
       user: req.user._id,
       destination,
@@ -47,10 +50,7 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// @desc    Get all trips for a user
-// @route   GET /api/trips
-// @access  Private
-router.get("/", protect, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const trips = await Trip.find({ user: req.user._id });
     res.json(trips);
@@ -59,10 +59,7 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// @desc    Get a specific trip
-// @route   GET /api/trips/:id
-// @access  Private
-router.get("/:id", protect, async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const trip = await Trip.findById(req.params.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
@@ -72,12 +69,11 @@ router.get("/:id", protect, async (req, res) => {
   }
 });
 
-// @desc    Update a trip
-// @route   PUT /api/trips/:id
-// @access  Private
-router.put("/:id", protect, async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
-    const trip = await Trip.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const trip = await Trip.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!trip) return res.status(404).json({ message: "Trip not found" });
     res.json(trip);
   } catch (error) {
@@ -85,10 +81,7 @@ router.put("/:id", protect, async (req, res) => {
   }
 });
 
-// @desc    Delete a trip
-// @route   DELETE /api/trips/:id
-// @access  Private
-router.delete("/:id", protect, async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const trip = await Trip.findByIdAndDelete(req.params.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });

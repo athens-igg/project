@@ -1,9 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+//const dotenv = require("dotenv");
 const cors = require("cors");
 
-dotenv.config(); // Load environment variables
+//dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json()); // Ensure JSON parsing middleware is used
@@ -11,10 +13,13 @@ app.use(express.urlencoded({ extended: true })); // Handle form data
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // Parses incoming JSON requests
+//app.use(express.json()); // Parses incoming JSON requests
 
 // Debugging: Check if API Key is loaded
-console.log("API Key Loaded:", process.env.OPENTRIPMAP_API_KEY ? "✅ Yes" : "❌ No");
+console.log(
+  "API Key Loaded:",
+  process.env.OPENTRIPMAP_API_KEY ? "✅ Yes" : "❌ No"
+);
 
 // Simple Test Route
 app.get("/", (req, res) => {
@@ -45,7 +50,6 @@ app.use("/api/trips", tripRoutes);
 
 const feedbackRoutes = require("./routes/feedbackRoutes");
 app.use("/api/feedback", feedbackRoutes);
-
 
 const galleryRoutes = require("./routes/galleryRoutes");
 app.use("/api/gallery", galleryRoutes);
