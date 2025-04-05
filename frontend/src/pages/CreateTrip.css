@@ -2,97 +2,98 @@
 .trip-planner-container {
   max-width: 700px;
   margin: 50px auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.75); /* Semi-transparent white */
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   text-align: center;
-  background-image: url('https://www.adventuretravelcoach.com/wp-content/uploads/2020/06/68AFCE60-6D7A-40C0-BD33-497926A30147.jpeg');
+  background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80');
+  background-size: cover;
+  background-position: center;
 }
 
 /* ---- HEADER STYLES ---- */
 .trip-planner-container h1 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 700;
   color: #2d3436;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 /* ---- FORM STYLES ---- */
 .trip-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
 }
 
 /* ---- LABELS ---- */
 .trip-form label {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #2d3436;
   text-align: left;
-  display: block;
-  font-style: bold;
 }
 
 /* ---- INPUT FIELDS ---- */
-.trip-form input, 
+.trip-form input,
 .trip-form select {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 12px 15px;
+  border: 1px solid #d1d8e0;
+  border-radius: 10px;
   font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .trip-form input:focus,
 .trip-form select:focus {
   border-color: #3498db;
   outline: none;
-  box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
-  background: white;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+  background-color: #fff;
 }
 
+/* ---- INTERESTS GRID ---- */
 .interests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust column width */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
 }
 
 .interests-grid label {
   display: flex;
   align-items: center;
-  justify-content: start; /* Align text and checkbox properly */
   gap: 8px;
   font-size: 1rem;
   color: #2d3436;
 }
 
-.interests-grid input {
+.interests-grid input[type="checkbox"] {
   transform: scale(1.2);
   cursor: pointer;
 }
 
-
 /* ---- SUBMIT BUTTON ---- */
 .submit-button {
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
-  cursor: pointer;
   background: linear-gradient(135deg, #4CAF50, #2E8B57);
   color: white;
   border: none;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .submit-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
 }
 
 /* ---- LOADING BUTTON ---- */
@@ -105,10 +106,51 @@
 @media (max-width: 768px) {
   .trip-planner-container {
     max-width: 90%;
-    padding: 20px;
+    padding: 25px;
   }
 
   .interests-grid {
     grid-template-columns: 1fr;
+  }
+
+  .trip-planner-container h1 {
+    font-size: 2rem;
+  }
+}
+/* ---- INTEREST PILL STYLES ---- */
+.interest-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: start;
+  margin-top: 10px;
+}
+
+.pill {
+  padding: 10px 18px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid #2d3436;
+  background-color: transparent;
+  color: #2d3436;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pill:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.pill.selected {
+  background-color: #2d3436;
+  color: white;
+  border-color: #2d3436;
+}
+
+@media (max-width: 768px) {
+  .interest-pills {
+    flex-direction: column;
+    gap: 10px;
   }
 }

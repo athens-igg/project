@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom"; // to get the itinerary ID from the URL
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext"; // Assuming you have an auth context
+import { useParams } from "react-router-dom";
+import { Card, Accordion, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Navbar, Nav, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 const ItineraryPage = () => {
-    const { id } = useParams(); // Get itinerary ID from URL
+    const { id } = useParams();
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { user, logout } = useAuth(); // Use auth context for user info
+    const { user, logout } = useAuth();
+    const [saved, setSaved] = useState(false);
 
-    // Fetch itinerary data when component mounts or id changes
     useEffect(() => {
         const fetchItinerary = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/trips/itinerary/${id}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
-                setItinerary(response.data); // Set the itinerary data to state
+                setItinerary(response.data);
             } catch (error) {
                 console.error("Error fetching itinerary:", error);
                 alert("Failed to fetch itinerary. Please try again.");
@@ -29,15 +32,32 @@ const ItineraryPage = () => {
         };
 
         fetchItinerary();
-    }, [id]); // This will run when the component mounts or when the `id` changes
+    }, [id]);
 
-    if (loading) {
-        return <div>Loading...</div>; // Show loading message until data is fetched
-    }
+    const saveItinerary = () => {
+        localStorage.setItem(`itinerary-${id}`, JSON.stringify(itinerary));
+        setSaved(true);
+    };
 
-    if (!itinerary) {
-        return <div>No itinerary found</div>; // Show error message if itinerary is not found
-    }
+    if (loading) return <div className="text-center mt-5">Loading...</div>;
+    if (!itinerary) return <div className="text-center mt-5">No itinerary found</div>;
+
+    // Extract markers from itinerary
+    const markers = [];
+    Object.values(itinerary.days).forEach(day => {
+        day.forEach(place => {
+            if (place.geometry && place.geometry.coordinates) {
+                markers.push({
+                    lat: place.geometry.coordinates[1], 
+                    lng: place.geometry.coordinates[0], 
+                    name: place.properties.name
+                });
+            }
+        });
+    });
+
+    // Default center position (first marker or fallback location)
+    const defaultCenter = markers.length > 0 ? [markers[0].lat, markers[0].lng] : [10.0, 76.0];
 
     return (
         <>
@@ -57,7 +77,7 @@ const ItineraryPage = () => {
                             <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
                             {user ? (
                                 <>
-                                    <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/* Show Profile if logged in */}
+                                    <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
                                     <Button variant="outline-danger" onClick={logout} className="ms-2">
                                         Logout
                                     </Button>
@@ -73,14 +93,65 @@ const ItineraryPage = () => {
                 </Container>
             </Navbar>
 
-            {/* Itinerary Details */}
-            <div className="container mt-5">
-                <h1>Itinerary for {itinerary.destination}</h1>
-                <p><strong>Trip ID:</strong> {itinerary.trip}</p>
-                <p><strong>User ID:</strong> {itinerary.user}</p>
-                {/* Display other itinerary details here */}
-                <pre>{JSON.stringify(itinerary, null, 2)}</pre>
-            </div>
+            {/* Itinerary Content */}
+            <Container className="mt-4">
+                <h2 className="mb-4 text-center">Itinerary for {itinerary.destination}</h2>
+                
+                {/* Save Itinerary Button */}
+                <Button variant="success" className="mb-3" onClick={saveItinerary} disabled={saved}>
+                    {saved ? "Itinerary Saved!" : "Save Itinerary"}
+                </Button>
+
+                {/* OpenStreetMap with Leaflet */}
+                <MapContainer center={defaultCenter} zoom={10} style={{ height: "400px", width: "100%" }}>
+                    <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {markers.map((marker, index) => (
+                        <Marker key={index} position={[marker.lat, marker.lng]}>
+                            <Popup>{marker.name}</Popup>
+                        </Marker>
+                    ))}
+                </MapContainer>
+
+                
+
+<Accordion defaultActiveKey="0">
+    {Object.entries(itinerary.days).map(([day, places], index) => (
+        <Accordion.Item eventKey={index.toString()} key={day}>
+            <Accordion.Header>📅 {day}</Accordion.Header>
+            <Accordion.Body>
+                <Row xs={1} sm={2} md={2} lg={3} xl={3} className="g-4">
+                    {places.map((place, idx) => (
+                        <Col key={idx}>
+                            <Card className="h-100 shadow-sm">
+                                {place.properties.image && (
+                                    <Card.Img
+                                        variant="top"
+                                        src={place.properties.image}
+                                        alt={place.properties.name}
+                                        style={{ height: "200px", objectFit: "cover" }}
+                                    />
+                                )}
+                                <Card.Body>
+                                    <Card.Title>{place.properties.name}</Card.Title>
+                                    <Card.Text>
+                        <strong>📍 Location:</strong> {place.geometry.coordinates[1]}, {place.geometry.coordinates[0]} <br />
+                        <strong>⭐ Rating:</strong> {place.properties.rate || "N/A"} <br />
+                        <strong>🔖 Category:</strong> {place.properties.kinds.replace(/_/g, " ")}
+                      </Card.Text>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+            </Accordion.Body>
+        </Accordion.Item>
+    ))}
+</Accordion>
+
+            </Container>
         </>
     );
 };

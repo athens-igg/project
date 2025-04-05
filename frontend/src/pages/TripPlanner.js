@@ -17,7 +17,7 @@ export default function TripPlanner() {
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const interestOptions = ["Foods", "Nature", "Religion", "Adventure", "Shopping"];
+  const interestOptions = ["Foods", "Beaches", "Cultural", "Gardens_and_Parks","Sport", "Museums","theatres_and_entertainments","Shops","historic"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,25 +126,27 @@ export default function TripPlanner() {
             required
           />
 
-          {/* Interests (Checkboxes) */}
-          <label>Interests</label>
-          <div className="interests-grid">
-            {interestOptions.map((interest) => (
-              <label key={interest}>
-                <input
-                  type="checkbox"
-                  value={interest}
-                  checked={interests.includes(interest)}
-                  onChange={(e) =>
-                    setInterests((prev) =>
-                      e.target.checked ? [...prev, interest] : prev.filter((i) => i !== interest)
-                    )
-                  }
-                />
-                {interest}
-              </label>
-            ))}
-          </div>
+          {/* Interests (Styled Pills) */}
+<label>Interests</label>
+<div className="interest-pills">
+  {interestOptions.map((interest) => (
+    <button
+      type="button"
+      key={interest}
+      className={`pill ${interests.includes(interest) ? "selected" : ""}`}
+      onClick={() =>
+        setInterests((prev) =>
+          prev.includes(interest)
+            ? prev.filter((i) => i !== interest)
+            : [...prev, interest]
+        )
+      }
+    >
+      {interest}
+    </button>
+  ))}
+</div>
+
 
           {/* Submit Button */}
           <button type="submit" className="submit-button" disabled={loading}>
