@@ -18,10 +18,6 @@ const tripSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    tripType: {
-        type: String,
-        required: true,
-    },
     interests: {
         type: [String], // Array of interests like ["Food", "Sightseeing"]
         required: true,

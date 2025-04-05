@@ -2,31 +2,27 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-//const dotenv = require("dotenv");
 const cors = require("cors");
 
-//dotenv.config(); // Load environment variables
-
 const app = express();
-app.use(express.json()); // Ensure JSON parsing middleware is used
-app.use(express.urlencoded({ extended: true })); // Handle form data
 
 // Middleware
 app.use(cors());
-//app.use(express.json()); // Parses incoming JSON requests
+app.use(express.json()); // Parse JSON requests
+app.use(express.urlencoded({ extended: true })); // Handle form data
 
-// Debugging: Check if API Key is loaded
+// Debug: Check if API Key is loaded
 console.log(
   "API Key Loaded:",
   process.env.OPENTRIPMAP_API_KEY ? "✅ Yes" : "❌ No"
 );
 
-// Simple Test Route
+// Test Route
 app.get("/", (req, res) => {
   res.send("Welcome to TravelWorld API!");
 });
 
-// Connect to MongoDB with better error handling & debugging
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -35,26 +31,18 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
   .catch((error) => {
     console.error("❌ MongoDB Connection Error:", error.message);
-    process.exit(1); // Stop the server if DB connection fails
+    process.exit(1); // Exit if DB connection fails
   });
 
 // Routes
-const userRoutes = require("./routes/userRoutes");
-app.use("/api/users", userRoutes);
-
-const destinationRoutes = require("./routes/destinationRoutes");
-app.use("/api/destinations", destinationRoutes);
-
-const tripRoutes = require("./routes/tripRoutes");
-app.use("/api/trips", tripRoutes);
-
-const feedbackRoutes = require("./routes/feedbackRoutes");
-app.use("/api/feedback", feedbackRoutes);
-
-const galleryRoutes = require("./routes/galleryRoutes");
-app.use("/api/gallery", galleryRoutes);
+app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/destinations", require("./routes/destinationRoutes"));
+app.use("/api/trips", require("./routes/tripRoutes"));
+app.use("/api/feedback", require("./routes/feedbackRoutes"));
+app.use("/api/gallery", require("./routes/galleryRoutes"));
 app.use("/uploads", express.static("uploads")); // Serve uploaded images
 
+// Health Check
 app.get("/api/destinations", (req, res) => {
   res.json({ message: "Destinations API is working!" });
 });

@@ -15,8 +15,8 @@ const uploadPhoto = async (req, res) => {
         .json({ message: "Location and date are required" });
 
     const newPhoto = await Gallery.create({
-      user: req.user._id, // ✅ Associate with logged-in user
-      imageURL: `/uploads/${req.file.filename}`, // ✅ Store image path
+      user: req.user._id,
+      imageURL: `/uploads/${req.file.filename}`,
       location,
       date,
     });
@@ -27,10 +27,10 @@ const uploadPhoto = async (req, res) => {
   }
 };
 
-// ✅ Get all photos
+// ✅ Get All Photos
 const getGallery = async (req, res) => {
   try {
-    const gallery = await Gallery.find().populate("user", "name"); // ✅ Show uploader's name
+    const gallery = await Gallery.find().populate("user", "name");
     res.json(gallery);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch gallery" });
@@ -49,7 +49,6 @@ const deletePhoto = async (req, res) => {
         .json({ message: "Not authorized to delete this photo" });
     }
 
-    // ✅ FIXED FILE PATH FOR DELETION
     const filePath = path.join(
       __dirname,
       "../uploads",
@@ -66,4 +65,8 @@ const deletePhoto = async (req, res) => {
   }
 };
 
-module.exports = { uploadPhoto, getGallery, deletePhoto };
+module.exports = {
+  uploadPhoto,
+  getGallery,
+  deletePhoto,
+};

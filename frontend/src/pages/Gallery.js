@@ -7,7 +7,7 @@ import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const Gallery = () => {
-    const { user, logout } = useAuth(); // ✅ Get logged-in user
+    const { user, logout } = useAuth(); //   Get logged-in user
     const [photos, setPhotos] = useState([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -16,7 +16,7 @@ const Gallery = () => {
     const [newDate, setNewDate] = useState("");
     const fileInputRef = useRef(null);
 
-    // ✅ Fetch gallery photos
+    //   Fetch gallery photos
     useEffect(() => {
         const fetchGallery = async () => {
             try {
@@ -29,7 +29,7 @@ const Gallery = () => {
         fetchGallery();
     }, []);
 
-    // ✅ Handle File Upload Preview
+    //   Handle File Upload Preview
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -42,7 +42,7 @@ const Gallery = () => {
         }
     };
 
-    // ✅ Upload Photo
+    //   Upload Photo
     const handleAddPhoto = async (e) => {
         e.preventDefault();
         if (!selectedFile || !newLocation || !newDate) {
@@ -60,7 +60,7 @@ const Gallery = () => {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
 
-            setPhotos([data, ...photos]); // ✅ Add new photo to state
+            setPhotos([data, ...photos]); //   Add new photo to state
             setIsFormOpen(false);
             setSelectedFile(null);
             setPreviewUrl("");
@@ -71,7 +71,7 @@ const Gallery = () => {
         }
     };
 
-    // ✅ Delete Photo
+    //   Delete Photo
     const handleDelete = async (photoId) => {
         if (!window.confirm("Are you sure you want to delete this photo?")) return;
 
@@ -87,7 +87,7 @@ const Gallery = () => {
 
     return (
         <>
-            {/* ✅ Navbar */}
+            {/*   Navbar */}
             <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
                 <Container>
                     <Navbar.Brand as={Link} to="/">
@@ -117,7 +117,7 @@ const Gallery = () => {
                 </Container>
             </Navbar>
 
-            {/* ✅ Gallery */}
+            {/*   Gallery */}
             <div className="gallery-container">
                 <h1>✈ Travel Memories</h1>
                 <h2 className="animated-subheading">
@@ -128,7 +128,7 @@ const Gallery = () => {
                     <button className="add-photo-button" onClick={() => setIsFormOpen(true)}>+</button>
                 )}
 
-                {/* ✅ Upload Form */}
+                {/*   Upload Form */}
                 {isFormOpen && (
                     <>
                         <div className="form-overlay" onClick={() => setIsFormOpen(false)} />
@@ -164,7 +164,7 @@ const Gallery = () => {
                     </>
                 )}
 
-                {/* ✅ Display Gallery */}
+                {/*   Display Gallery */}
                 <div className="gallery-grid">
                     {photos.length > 0 ? (
                         photos.map((photo) => (

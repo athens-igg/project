@@ -27,7 +27,7 @@ const fetchPlaces = async (lat, lon, interests, radius = 10000) => {
             radius,
             lon,
             lat,
-            kinds: interests.join(","), // Convert array to comma-separated string
+            kinds: interests.map(i => i.toLowerCase()).join(","), // Convert array to comma-separated string
             apikey: API_KEY,
         };
 

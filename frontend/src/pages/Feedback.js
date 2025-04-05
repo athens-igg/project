@@ -35,7 +35,7 @@ const FeedbackPage = () => {
     }
   
     try {
-      // ✅ Retrieve the token from localStorage
+      //   Retrieve the token from localStorage
       const token = localStorage.getItem("token");
   
       if (!token) {
@@ -49,7 +49,7 @@ const FeedbackPage = () => {
       };
   
       const { data } = await axios.post("http://localhost:5000/api/feedback", newReview, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // ✅ Correctly send token
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, //   Correctly send token
       });
   
       setSubmittedReviews([...submittedReviews, data]);
@@ -93,7 +93,7 @@ const FeedbackPage = () => {
               <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
               {user ? (
                 <>
-                <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/* ✅ Show Profile if logged in */}
+                <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/*   Show Profile if logged in */}
                 <Button variant="outline-danger" onClick={logout} className="ms-2">
                   Logout
                 </Button>
@@ -155,7 +155,7 @@ const FeedbackPage = () => {
                                 </div>
                                 <p className="review-text">{item.comment}</p>
                                 <p className="review-date">{new Date(item.createdAt).toLocaleDateString()}</p>
-                              {/* ✅ Show delete button only for the logged-in user's feedback */}
+                              {/*   Show delete button only for the logged-in user's feedback */}
         {user && user._id === item.user && (
             <button onClick={() => handleDelete(item._id)} className="btn btn-danger btn-sm">
                 Delete

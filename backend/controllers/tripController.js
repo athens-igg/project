@@ -1,36 +1,51 @@
 const Trip = require("../models/tripModel");
+const Itinerary = require("../models/Itinerary"); 
 
 // @desc    Create a new trip
 // @route   POST /api/trips
 // @access  Private
 const createTrip = async (req, res) => {
-    try {
-        const { destination, startDate, endDate, tripType, interests, budget } = req.body;
+  try {
+      const { destination, startDate, endDate, interests, budget } = req.body;
 
-        // Check if all required fields are provided
-        if (!destination || !startDate || !endDate || !tripType || !interests || !budget) {
-            return res.status(400).json({ message: "Please provide all fields" });
-        }
+      // Validate required fields
+      if (!destination || !startDate || !endDate || !interests || budget === undefined) {
+          return res.status(400).json({ message: "Please provide all required fields" });
+      }
 
-        // Create a new trip in the database
-        const trip = new Trip({
-            user: req.user.id, // Assuming authentication is required
-            destination,
-            startDate,
-            endDate,
-            tripType,
-            interests,
-            budget,
-        });
+      // Ensure interests is an array
+      if (!Array.isArray(interests) || interests.length === 0) {
+          return res.status(400).json({ message: "Interests must be a non-empty array" });
+      }
 
-        const createdTrip = await trip.save();
+      // Validate start and end dates
+      if (new Date(startDate) >= new Date(endDate)) {
+          return res.status(400).json({ message: "Start date must be before end date" });
+      }
 
-        res.status(201).json(createdTrip);
-    } catch (error) {
-        console.error("Error creating trip:", error);
-        res.status(500).json({ message: "Failed to create trip" });
-    }
+      // Validate budget
+      if (budget < 0) {
+          return res.status(400).json({ message: "Budget must be a positive number" });
+      }
+
+      // Create and save the trip
+      const trip = new Trip({
+          user: req.user.id,
+          destination,
+          startDate,
+          endDate,
+          interests,
+          budget,
+      });
+
+      const createdTrip = await trip.save();
+      res.status(201).json(createdTrip);
+  } catch (error) {
+      console.error("Error creating trip:", error);
+      res.status(500).json({ message: "Failed to create trip", error });
+  }
 };
+
 
 // @desc    Get all trips for the logged-in user
 // @route   GET /api/trips
@@ -44,7 +59,7 @@ const getTrips = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch trips" });
     }
 };
-// ✅ Update a trip
+//   Update a trip
 const updateTrip = async (req, res) => {
     try {
       const trip = await Trip.findById(req.params.id);
@@ -69,7 +84,7 @@ const updateTrip = async (req, res) => {
     }
   };
   
-  // ✅ Delete a trip
+  //   Delete a trip
   const deleteTrip = async (req, res) => {
     try {
       const trip = await Trip.findById(req.params.id);
@@ -89,16 +104,21 @@ const updateTrip = async (req, res) => {
       res.status(500).json({ message: "Error deleting trip", error });
     }
   };
-  const getTripItinerary = async (req, res) => {
+  // Get Itinerary for a Specific Trip
+const getTripItinerary = async (req, res) => {
     try {
-        const trip = await Trip.findById(req.params.id);
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
+        const { id } = req.params;  // Get itinerary ID from URL
+        const itinerary = await Itinerary.findById(id);
+        
+        if (!itinerary) {
+            return res.status(404).json({ message: "Itinerary not found" });
         }
-        res.json(trip.itinerary);
+
+        res.status(200).json(itinerary);
     } catch (error) {
-        res.status(500).json({ message: "Failed to fetch itinerary" });
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
     }
 };
-  
+
   module.exports = { getTrips, createTrip, updateTrip, deleteTrip, getTripItinerary };

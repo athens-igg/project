@@ -3,14 +3,13 @@ import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-//import { motion } from "framer-motion";
 
 const Profile = () => {
   const { user, logout } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // For redirection
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -20,7 +19,7 @@ const Profile = () => {
         console.log("❌ No token found in localStorage");
         setError("User not authenticated.");
         setLoading(false);
-        navigate("/login"); // Redirect if not authenticated
+        navigate("/login");
         return;
       }
 
@@ -30,7 +29,7 @@ const Profile = () => {
         const response = await fetch("http://localhost:5000/api/users", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // ✅ Fix Authorization header
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -42,7 +41,7 @@ const Profile = () => {
         const data = await response.json();
         console.log("✅ Parsed JSON Data:", data);
 
-        setUserData(data); // Set name and email from backend
+        setUserData(data);
       } catch (error) {
         console.error("🚨 Error fetching user data:", error);
         setError("Failed to load user data. Please try again.");
@@ -57,7 +56,6 @@ const Profile = () => {
   if (loading)
     return <div className="text-center p-6">Loading user data...</div>;
   if (error) return <div className="text-center p-6 text-red-600">{error}</div>;
-  console.log("🖼️ Profile Photo URL:", userData.profilePhoto);
 
   return (
     <>
@@ -134,10 +132,8 @@ const Profile = () => {
       <div className="min-h-screen bg-gray-100 p-6">
         {/* Profile Section */}
         <div className="bg-white shadow-md p-6 rounded-lg max-w-lg mx-auto text-center">
-          <h2 className="text-2xl font-bold text-gray-900">{userData?.name}</h2>{" "}
-          {/* Display name */}
-          <p className="text-gray-600">{userData?.email}</p>{" "}
-          {/* Display email */}
+          <h2 className="text-2xl font-bold text-gray-900">{userData?.name}</h2>
+          <p className="text-gray-600">{userData?.email}</p>
         </div>
       </div>
     </>
