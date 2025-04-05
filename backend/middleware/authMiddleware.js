@@ -1,29 +1,37 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Ensure correct path to User model
+const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
 
-const protect = asyncHandler(async (req, res, next) => {
-  let token;
+const authMiddleware = asyncHandler(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  // Check if token exists in Authorization header
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      console.log("🔑 Received Token in Backend:", token); // ✅ Debugging log
+  // Check if Authorization header exists and starts with "Bearer"
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
+    return res
+      .status(401)
+      .json({ message: "No token provided, authorization denied" });
+  }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("🔍 Decoded Token:", decoded); // ✅ Debugging log
+  const token = authHeader.split(" ")[1]; // Extract token
 
-      req.user = await User.findById(decoded.id).select("-password");
-      console.log("✅ Authenticated User:", req.user); // ✅ Debugging log
-      next(); // Proceed to protected route
-    } catch (error) {
-      console.error("Authorization error:", error.message);
-      res.status(401).json({ message: "Unauthorized - Invalid or expired token" });
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach user to request, excluding password
+    req.user = await User.findById(decoded.id).select("-password");
+
+    if (!req.user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  } else {
-    res.status(401).json({ message: "No token provided, authorization denied" });
+
+    next(); // Proceed to the next middleware
+  } catch (error) {
+    console.error("Authentication Error:", error.message);
+    res
+      .status(401)
+      .json({ message: "Unauthorized - Invalid or expired token" });
   }
 });
 
-module.exports = { protect };
+module.exports = authMiddleware;
