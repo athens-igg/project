@@ -1,17 +1,17 @@
 const express = require("express");
-const authMiddleware = require("../middleware/authMiddleware"); // Correct import
+const { protect } = require("../middleware/authMiddleware"); // Unified import
+
 const {
   createFeedback,
   getAllFeedback,
   deleteFeedback,
-} = require("../controllers/feedbackController"); // Ensure deleteFeedback is exported
+} = require("../controllers/feedbackController");
 
 const router = express.Router();
 
 // Routes
-router.post("/", authMiddleware, createFeedback); // ✅ Submit feedback
-router.get("/", getAllFeedback); // ✅ Get all feedback
-// router.get("/:tripId", getFeedbackForTrip); // ✅ Get feedback for a specific trip (if implemented)
-router.delete("/:id", authMiddleware, deleteFeedback); // ✅ Delete feedback (Only owner)
+router.post("/", protect, createFeedback); // Submit feedback (protected)
+router.get("/", getAllFeedback); // Get all feedback (public)
+router.delete("/:id", protect, deleteFeedback); // Delete feedback (protected, owner only)
 
 module.exports = router;

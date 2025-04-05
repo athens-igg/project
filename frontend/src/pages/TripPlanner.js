@@ -1,68 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext"; // Custom hook for authentication state
+import { useAuth } from "../auth/AuthContext"; 
 import "bootstrap/dist/css/bootstrap.min.css";
-import  { useState } from "react";
-//import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import "./CreateTrip.css"; 
 
-
-function CreateTrip() {
-  const [destination, setDestination] = useState("");
-  const [days, setDays] = useState("");
-  const [people, setPeople] = useState("");
-  const [budget, setBudget] = useState("");
-  const [type, setType] = useState("relaxation");
+export default function TripPlanner() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth(); // Auth state for login/logout
+  const [destination, setDestination] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [budget, setBudget] = useState("");
+  const [interests, setInterests] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateTrip = async (e) => {
+  const interestOptions = ["Foods", "Beaches", "Cultural", "Gardens_and_Parks","Sport", "Museums","theatres_and_entertainments","Shops","historic"];
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const tripData = {
-        destination,
-        days: Number(days),   // Convert to number
-        people: Number(people),
-        budget: Number(budget),
-        type
-      };
-    
-      console.log("Sending Trip Data:", tripData); // Debugging
+      destination,
+      startDate,
+      endDate,
+      interests,
+      budget: Number(budget),
+    };
 
     try {
-      //const token = localStorage.getItem("token");
-
-     /* const response = await axios.post(
-        "http://localhost:5000/api/trips/create",
-        { destination, days, people, budget, type },
-        { headers: { Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json" } }
-      );*/
-
-      alert("Trip created successfully!");
-      navigate("/itinerary"); // Redirect to user profile
-    } catch (error) {
-       console.error("Error Response:", error.response ? error.response.data : error.message);
-    alert("Failed to create trip. Please check your input and try again.");
-}
-  };
-  const { user, logout } = useAuth();
+      const response = await axios.post("http://localhost:5000/api/trips", tripData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
   
+      // After creating the trip, get the itinerary ID from the backend
+      const itineraryResponse = await axios.get(`http://localhost:5000/api/trips/${response.data._id}/itinerary/generate`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+  
+      // Use the itinerary ID to navigate to the itinerary page
+      navigate(`/itinerary/${itineraryResponse.data.itineraryId}`);
+  } catch (error) {
+      console.error("Error creating trip:", error);
+      alert("Failed to create trip. Please try again.");
+  } finally {
+      setLoading(false);
+  }
+  
+  };
 
   return (
     <>
-      {/* HEADER */}
+      {/* Navbar */}
       <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
-    
         <Container>
           <Navbar.Brand as={Link} to="/">
-            <img
-              src="/logo.png"
-              alt="TravelWorld Logo"
-              width="40"
-              height="40"
-              className="d-inline-block align-top me-2"
-            />
+            <img src="/logo.png" alt="TravelWorld Logo" width="50" height="50" className="me-2" />
             <span className="travelworld-text">TravelWorld</span>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -74,63 +70,90 @@ function CreateTrip() {
               <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
               {user ? (
                 <>
-                <Nav.Link as={Link} to="/profile">Profile</Nav.Link> {/* ✅ Show Profile if logged in */}
-                <Button variant="outline-danger" onClick={logout} className="ms-2">
-                  Logout
-                </Button>
-              </>
+                  <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
+                  <Button variant="outline-danger" onClick={logout} className="ms-2">
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <>
-                  <Button as={Link} to="/login" variant="outline-primary" className="ms-2">
-                    Login
-                  </Button>
-                  <Button as={Link} to="/register" variant="primary" className="ms-2">
-                    Register
-                  </Button>
+                  <Button as={Link} to="/login" variant="outline-primary" className="ms-2">Login</Button>
+                  <Button as={Link} to="/register" variant="primary" className="ms-2">Register</Button>
                 </>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-     
+
+      {/* Trip Planner Form */}
+      <div className="trip-planner-container">
+        <h1>Plan Your Trip</h1>
+        <form className="trip-form" onSubmit={handleSubmit}>
+          {/* Destination Input */}
+          <label>Destination</label>
+          <input
+            type="text"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            required
+          />
+
+          {/* Start Date Input */}
+          <label>Start Date</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
+          />
+
+          {/* End Date Input */}
+          <label>End Date</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            required
+          />
+
+          {/* Budget Input */}
+          <label>Budget </label>
+          <input
+            type="number"
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+            required
+          />
+
+          {/* Interests (Styled Pills) */}
+<label>Interests</label>
+<div className="interest-pills">
+  {interestOptions.map((interest) => (
+    <button
+      type="button"
+      key={interest}
+      className={`pill ${interests.includes(interest) ? "selected" : ""}`}
+      onClick={() =>
+        setInterests((prev) =>
+          prev.includes(interest)
+            ? prev.filter((i) => i !== interest)
+            : [...prev, interest]
+        )
+      }
+    >
+      {interest}
+    </button>
+  ))}
+</div>
 
 
-
-  return (
-    <div>
-      <h2>Create a Trip</h2>
-      <form onSubmit={handleCreateTrip}>
-        <input type="text" placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} required />
-        <input type="number" placeholder="Number of Days" value={days} onChange={(e) => setDays(e.target.value)} required />
-        <input type="number" placeholder="Number of People" value={people} onChange={(e) => setPeople(e.target.value)} required />
-        <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} required />
-        
-        <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="relaxation">Relaxation</option>
-          <option value="adventure">Adventure</option>
-          <option value="food">Food</option>
-          <option value="cultural">Cultural</option>
-        </select>
-
-        <Button
-                  variant="success"
-                  onClick={() => (user ? navigate("/itinerary/:id") : navigate("/login"))}
-                >
-                  {user ? "Create a Trip" : "Plan a Trip"}
-                </Button>
-      </form>
-    </div>
-  );
-
-
-      
-
-     
-
-     
+          {/* Submit Button */}
+          <button type="submit" className="submit-button" disabled={loading}>
+            {loading ? "Generating Itinerary..." : "Create Trip"}
+          </button>
+        </form>
+      </div>
     </>
   );
-};
-
-export default CreateTrip;
+}
