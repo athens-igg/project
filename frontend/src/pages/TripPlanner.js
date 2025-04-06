@@ -18,7 +18,10 @@ export default function TripPlanner() {
   const [loading, setLoading] = useState(false);
 
   const interestOptions = ["Foods", "Beaches", "Cultural", "Gardens_and_Parks","Sport", "Museums","theatres_and_entertainments","Shops","historic"];
-
+  const handleLogout = () => {
+    logout();       // Clear user session
+    navigate("/");  // Redirect to homepage
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -55,30 +58,56 @@ export default function TripPlanner() {
   return (
     <>
       {/* Navbar */}
-      <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
+      <Navbar style={{ backgroundColor: "#e9ecef" }} expand="lg" className="shadow-sm py-2">
+      
         <Container>
-          <Navbar.Brand as={Link} to="/">
-            <img src="/logo.png" alt="TravelWorld Logo" width="50" height="50" className="me-2" />
-            <span className="travelworld-text">TravelWorld</span>
-          </Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+        <img
+          src="/logo.png"
+          alt="TravelWorld Logo"
+          width="50"
+          height="50"
+          className="d-inline-block align-top me-2"
+        />
+        <span className="fs-2 fw-bold">TravelWorld</span>
+      </Navbar.Brand>
+      
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link as={Link} to="/">Home</Nav.Link>
-              <Nav.Link as={Link} to="/trip-planner">Trip Planner</Nav.Link>
-              <Nav.Link as={Link} to="/gallery">Gallery</Nav.Link>
-              <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
+            <Nav className="ms-auto align-items-center">
+              <Nav.Link as={Link} to="/" className="fs-5">Home</Nav.Link>
+              <Nav.Link as={Link} to="/trip-planner" className="fs-5">Trip Planner</Nav.Link>
+              <Nav.Link as={Link} to="/gallery" className="fs-5">Gallery</Nav.Link>
+              <Nav.Link as={Link} to="/feedback" className="fs-5">Feedback</Nav.Link>
               {user ? (
                 <>
-                  <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                  <Button variant="outline-danger" onClick={logout} className="ms-2">
+                  <Nav.Link as={Link} to="/profile" className="fs-5">Profile</Nav.Link>
+                  <Button
+                    variant="outline-danger"
+                    onClick={handleLogout}
+                    className="ms-2 fs-6 fw-semibold"
+                  >
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button as={Link} to="/login" variant="outline-primary" className="ms-2">Login</Button>
-                  <Button as={Link} to="/register" variant="primary" className="ms-2">Register</Button>
+                  <Button
+                    as={Link}
+                    to="/login"
+                    variant="outline-primary"
+                    className="ms-2 fs-6 fw-semibold"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/register"
+                    variant="primary"
+                    className="ms-2 fs-6 fw-semibold"
+                  >
+                    Register
+                  </Button>
                 </>
               )}
             </Nav>
@@ -149,7 +178,12 @@ export default function TripPlanner() {
 
 
           {/* Submit Button */}
-          <button type="submit" className="submit-button" disabled={loading}>
+          <button type="submit" className="submit-button" disabled={loading}onClick={(e) => {
+    if (!user) {
+      e.preventDefault(); // Prevent form submission
+      navigate("/login");
+    }
+  }}>
             {loading ? "Generating Itinerary..." : "Create Trip"}
           </button>
         </form>

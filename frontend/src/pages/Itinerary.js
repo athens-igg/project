@@ -14,7 +14,7 @@ const ItineraryPage = () => {
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user, logout } = useAuth();
-    const [saved, setSaved] = useState(false);
+    //const [saved, setSaved] = useState(false);
 
     useEffect(() => {
         const fetchItinerary = async () => {
@@ -34,10 +34,10 @@ const ItineraryPage = () => {
         fetchItinerary();
     }, [id]);
 
-    const saveItinerary = () => {
+    /*const saveItinerary = () => {
         localStorage.setItem(`itinerary-${id}`, JSON.stringify(itinerary));
         setSaved(true);
-    };
+    };*/
 
     if (loading) return <div className="text-center mt-5">Loading...</div>;
     if (!itinerary) return <div className="text-center mt-5">No itinerary found</div>;
@@ -97,10 +97,10 @@ const ItineraryPage = () => {
             <Container className="mt-4">
                 <h2 className="mb-4 text-center">Itinerary for {itinerary.destination}</h2>
                 
-                {/* Save Itinerary Button */}
+                {/* Save Itinerary Button 
                 <Button variant="success" className="mb-3" onClick={saveItinerary} disabled={saved}>
                     {saved ? "Itinerary Saved!" : "Save Itinerary"}
-                </Button>
+                </Button>*/}
 
                 {/* OpenStreetMap with Leaflet */}
                 <MapContainer center={defaultCenter} zoom={10} style={{ height: "400px", width: "100%" }}>

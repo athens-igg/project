@@ -1,8 +1,8 @@
 const { getDestinationCoordinates, fetchPlaces } = require("../services/openTripMapService");
 const Itinerary = require("../models/Itinerary");
 const Trip = require("../models/tripModel");
-const axios = require("axios");  // ✅ Import axios
-const mongoose = require("mongoose"); // ✅ Add this
+const axios = require("axios");   
+const mongoose = require("mongoose"); 
 
 
 
@@ -35,27 +35,6 @@ const generateItinerary = async (req, res) => {
     }
 };
 
-
-
-// Get Itinerary for a Specific Trip
-/*const getTripItinerary = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized - Please log in" });
-        }
-        const { id } = req.params;  // Get itinerary ID from URL
-        const itinerary = await Itinerary.findById(id);
-
-        if (!itinerary) {
-            return res.status(404).json({ message: "Itinerary not found" });
-        }
-
-        res.status(200).json(itinerary);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
-};*/
 const createItineraryFromTrip = async (req, res) => {
     try {
         const { id } = req.params;
@@ -148,33 +127,7 @@ function sortPlacesByDistance(places) {
     });
 }
 
-/**
- * Function to structure an itinerary into days
- */
-const structureItinerary = (places, startDate, numDays) => {
-    let itinerary = [];
 
-    // Initialize empty itinerary for each day
-    for (let day = 0; day < numDays; day++) {
-        itinerary.push({
-            day: day + 1,
-            date: new Date(new Date(startDate).getTime() + day * 86400000).toISOString().split("T")[0],
-            places: [],
-        });
-    }
-
-    // Distribute places across days
-    places.forEach((place, index) => {
-        let dayIndex = index % numDays;
-        itinerary[dayIndex].places.push({
-            name: place.properties.name,
-            category: place.properties.kinds.replace(/_/g, " "), // Readable format
-            location: place.geometry,
-        });
-    });
-
-    return itinerary;
-};
 //   Fetch itineraries for the logged-in user
 const getUserItineraries = async (req, res) => {
     try {
@@ -186,22 +139,5 @@ const getUserItineraries = async (req, res) => {
     }
 };
 
-
-/**
- * Generate AI-like itinerary summary
- */
-function generateItinerarySummary(places, numDays) {
-    let summary = `Your ${numDays}-day trip includes visits to:\n\n`;
-    
-    places.forEach((place, index) => {
-        summary += `- **${place.properties.name}**: A great spot for ${place.properties.kinds.replace(/_/g, " ")}.\n`;
-        
-        if ((index + 1) % 4 === 0) {
-            summary += `\n---\n\n`; // Separate days
-        }
-    });
-
-    return summary;
-}
 
 module.exports = { generateItinerary, getUserItineraries,createItineraryFromTrip };
