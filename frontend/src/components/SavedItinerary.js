@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Container, Card, Button } from "react-bootstrap";
+import { Container, Card, Button, ListGroup } from "react-bootstrap";
 
 const SavedItinerary = () => {
   const { id } = useParams();
@@ -25,6 +25,7 @@ const SavedItinerary = () => {
           }
         );
         setItinerary(res.data);
+        console.log("Fetched itinerary:", res.data);
       } catch (err) {
         console.error("❌ Error loading itinerary:", err);
         setError("Itinerary not found or you don’t have access.");
@@ -34,8 +35,14 @@ const SavedItinerary = () => {
     fetchItinerary();
   }, [id, navigate]);
 
-  if (error) return <div className="text-center p-4 text-red-600">{error}</div>;
+  if (error) return <div className="text-center p-4 text-danger">{error}</div>;
   if (!itinerary) return <div className="text-center p-4">Loading...</div>;
+
+  const sortedDays = Object.entries(itinerary.days || {}).sort(([a], [b]) => {
+    const dayA = parseInt(a.replace(/[^\d]/g, ""), 10);
+    const dayB = parseInt(b.replace(/[^\d]/g, ""), 10);
+    return dayA - dayB;
+  });
 
   return (
     <Container className="py-5">
@@ -53,10 +60,53 @@ const SavedItinerary = () => {
           {new Date(itinerary.endDate).toLocaleDateString()}
         </p>
         <p>
-          <strong>Total Days:</strong> {itinerary.days?.length}
+          <strong>Total Days:</strong>{" "}
+          {Object.keys(itinerary.days || {}).length}
         </p>
 
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        {sortedDays.length > 0 ? (
+          <div className="mt-4">
+            <h4>Day-wise Itinerary:</h4>
+            {sortedDays.map(([dayLabel, activities], index) => (
+              <Card key={index} className="mb-3 p-3">
+                <h5>{dayLabel}</h5>
+                {activities.length > 0 ? (
+                  <ListGroup variant="flush">
+                    {activities.map((activity, i) => (
+                      <ListGroup.Item key={i}>
+                        {typeof activity === "object" ? (
+                          activity?.properties?.name?.trim() ? (
+                            activity.properties.name
+                          ) : (
+                            <a
+                              href={`https://www.openstreetmap.org/${activity.properties.osm}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Unnamed Place
+                            </a>
+                          )
+                        ) : (
+                          activity
+                        )}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                ) : (
+                  <p className="text-muted">No activities listed.</p>
+                )}
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <p>No day-wise breakdown available.</p>
+        )}
+
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          className="mt-3"
+        >
           Back
         </Button>
       </Card>
@@ -65,74 +115,3 @@ const SavedItinerary = () => {
 };
 
 export default SavedItinerary;
-/*
-
-// SavedItinerary.js
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-
-const SavedItinerary = () => {
-  const { id } = useParams();
-  const [itinerary, setItinerary] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchItinerary = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const response = await axios.get(
-          `http://localhost:5000/api/itineraries/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setItinerary(response.data);
-      } catch (err) {
-        setError("Failed to load itinerary.");
-        console.error(err);
-      }
-    };
-
-    fetchItinerary();
-  }, [id]);
-
-  if (error) return <div>{error}</div>;
-  if (!itinerary) return <div>Loading...</div>;
-
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">{itinerary.trip}</h2>
-      <p className="text-gray-600 mb-2">Destination: {itinerary.destination}</p>
-      <p className="text-gray-600 mb-6">
-        {itinerary.startDate} to {itinerary.endDate}
-      </p>
-
-      <h3 className="text-xl font-semibold mb-3">Day-wise Breakdown:</h3>
-      {itinerary.days && itinerary.days.length > 0 ? (
-        itinerary.days.map((day, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg shadow-md p-4 mb-4 border border-gray-200"
-          >
-            <h4 className="font-bold">Day {index + 1}</h4>
-            <ul className="list-disc list-inside">
-              {day.activities?.map((activity, i) => (
-                <li key={i}>{activity}</li>
-              ))}
-            </ul>
-          </div>
-        ))
-      ) : (
-        <p>No day-wise activities found.</p>
-      )}
-    </div>
-  );
-};
-
-export default SavedItinerary;
-*/

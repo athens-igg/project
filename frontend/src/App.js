@@ -11,6 +11,7 @@ import Feedback from "./pages/Feedback";
 import Gallery from "./pages/Gallery";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import SavedItinerary from "./components/SavedItinerary";
 import "./App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/itinerary/:id" element={<Itinerary />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/gallery" element={<Gallery />} />
+              <Route path="/saved-itinerary/:id" element={<SavedItinerary />} />
             </Routes>
           </div>
           <Footer />
