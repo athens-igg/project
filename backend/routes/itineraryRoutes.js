@@ -72,4 +72,22 @@ router.get("/mine", protect, async (req, res) => {
   }
 });
 
+// ✅ Route to get a specific itinerary by ID
+router.get("/:id", protect, async (req, res) => {
+  try {
+    const itinerary = await Itinerary.findById(req.params.id);
+
+    if (!itinerary || itinerary.user.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({ message: "Itinerary not found or unauthorized" });
+    }
+
+    res.json(itinerary);
+  } catch (error) {
+    console.error("❌ Error fetching itinerary:", error);
+    res.status(500).json({ message: "Failed to fetch itinerary" });
+  }
+});
+
 module.exports = router;
