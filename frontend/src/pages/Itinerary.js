@@ -47,9 +47,33 @@ const ItineraryPage = () => {
     fetchItinerary();
   }, [id]);
 
-  const saveItinerary = () => {
-    localStorage.setItem(`itinerary-${id}`, JSON.stringify(itinerary));
-    setSaved(true);
+  const saveItinerary = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        "http://localhost:5000/api/itineraries",
+        {
+          trip: itinerary._id, // assuming trip ID is in the itinerary data
+          destination: itinerary.destination,
+          startDate: itinerary.startDate,
+          endDate: itinerary.endDate,
+          days: itinerary.days,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("✅ Saved:", response.data);
+      setSaved(true);
+    } catch (error) {
+      console.error("❌ Failed to save:", error);
+      alert("Failed to save itinerary.");
+    }
   };
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
