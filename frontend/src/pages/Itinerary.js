@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Card,
   Accordion,
@@ -19,9 +19,15 @@ import "leaflet/dist/leaflet.css";
 const ItineraryPage = () => {
   const { id } = useParams();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+
+  const handleLogout = () => {
+    logout(); // Clear user session
+    navigate("/"); // Redirect to homepage
+  };
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -34,7 +40,7 @@ const ItineraryPage = () => {
             },
           }
         );
-        console.log("🎯 Itinerary data received:", response.data); // <--- Add this
+        console.log("🎯 Itinerary data received:", response.data);
         setItinerary(response.data);
       } catch (error) {
         console.error("Error fetching itinerary:", error);
@@ -54,7 +60,7 @@ const ItineraryPage = () => {
       const response = await axios.post(
         "http://localhost:5000/api/itineraries",
         {
-          trip: itinerary._id, // assuming trip ID is in the itinerary data
+          trip: itinerary._id,
           destination: itinerary.destination,
           startDate: itinerary.startDate,
           endDate: itinerary.endDate,
@@ -137,7 +143,7 @@ const ItineraryPage = () => {
                   </Nav.Link>
                   <Button
                     variant="outline-danger"
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="ms-2"
                   >
                     Logout
