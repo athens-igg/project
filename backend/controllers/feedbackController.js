@@ -51,5 +51,4 @@ const deleteFeedback = async (req, res) => {
     }
 };
 
-//   Ensure `deleteFeedback` is exported properly
 module.exports = { createFeedback, getAllFeedback, deleteFeedback }; 

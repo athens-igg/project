@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import "./Gallery.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -15,6 +16,12 @@ const Gallery = () => {
     const [newLocation, setNewLocation] = useState("");
     const [newDate, setNewDate] = useState("");
     const fileInputRef = useRef(null);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();       // Clear user session
+        navigate("/");  // Redirect to homepage
+      };
 
     //   Fetch gallery photos
     useEffect(() => {
@@ -88,34 +95,63 @@ const Gallery = () => {
     return (
         <>
             {/*   Navbar */}
-            <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
-                <Container>
-                    <Navbar.Brand as={Link} to="/">
-                        <img src="/logo.png" alt="TravelWorld Logo" width="40" height="40" className="d-inline-block align-top me-2" />
-                        <span className="travelworld-text">TravelWorld</span>
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto">
-                            <Nav.Link as={Link} to="/">Home</Nav.Link>
-                            <Nav.Link as={Link} to="/trip-planner">Trip Planner</Nav.Link>
-                            <Nav.Link as={Link} to="/gallery">Gallery</Nav.Link>
-                            <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
-                            {user ? (
-                                <>
-                                    <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                                    <Button variant="outline-danger" onClick={logout} className="ms-2">Logout</Button>
-                                </>
-                            ) : (
-                                <>
-                                    <Button as={Link} to="/login" variant="outline-primary" className="ms-2">Login</Button>
-                                    <Button as={Link} to="/register" variant="primary" className="ms-2">Register</Button>
-                                </>
-                            )}
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
+            <Navbar style={{ backgroundColor: "#e9ecef" }} expand="lg" className="shadow-sm py-2">
+            
+              <Container>
+              <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+              <img
+                src="/logo.png"
+                alt="TravelWorld Logo"
+                width="50"
+                height="50"
+                className="d-inline-block align-top me-2"
+              />
+              <span className="fs-2 fw-bold">TravelWorld</span>
+            </Navbar.Brand>
+            
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="ms-auto align-items-center">
+                    <Nav.Link as={Link} to="/" className="fs-5">Home</Nav.Link>
+                    <Nav.Link as={Link} to="/trip-planner" className="fs-5">Trip Planner</Nav.Link>
+                    <Nav.Link as={Link} to="/gallery" className="fs-5">Gallery</Nav.Link>
+                    <Nav.Link as={Link} to="/feedback" className="fs-5">Feedback</Nav.Link>
+                    {user ? (
+                      <>
+                        <Nav.Link as={Link} to="/profile" className="fs-5">Profile</Nav.Link>
+                        <Button
+                          variant="outline-danger"
+                          onClick={handleLogout}
+                          className="ms-2 fs-6 fw-semibold"
+                        >
+                          Logout
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          as={Link}
+                          to="/login"
+                          variant="outline-primary"
+                          className="ms-2 fs-6 fw-semibold"
+                        >
+                          Login
+                        </Button>
+                        <Button
+                          as={Link}
+                          to="/register"
+                          variant="primary"
+                          className="ms-2 fs-6 fw-semibold"
+                        >
+                          Register
+                        </Button>
+                      </>
+                    )}
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
             </Navbar>
+
 
             {/*   Gallery */}
             <div className="gallery-container">

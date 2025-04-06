@@ -26,26 +26,28 @@ const Login = () => {
   return (
     <>
     {/* HEADER */}
-    <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          <img
-            src="/logo.png"
-            alt="TravelWorld Logo"
-            width="40"
-            height="40"
-            className="d-inline-block align-top me-2"
-          />
-          <span className="travelworld-text">TravelWorld</span>
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/trip-planner">Trip Planner</Nav.Link>
-            <Nav.Link as={Link} to="/gallery">Gallery</Nav.Link>
-            <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
-            <Button as={Link} to="/register" variant="primary" className="ms-2">
+    <Navbar style={{ backgroundColor: "#e9ecef" }} expand="lg" className="shadow-sm py-2">
+          
+            <Container>
+            <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+            <img
+              src="/logo.png"
+              alt="TravelWorld Logo"
+              width="50"
+              height="50"
+              className="d-inline-block align-top me-2"
+            />
+            <span className="fs-2 fw-bold">TravelWorld</span>
+          </Navbar.Brand>
+          
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Collapse id="basic-navbar-nav">
+                <Nav className="ms-auto align-items-center">
+                  <Nav.Link as={Link} to="/" className="fs-5">Home</Nav.Link>
+                  <Nav.Link as={Link} to="/trip-planner" className="fs-5">Trip Planner</Nav.Link>
+                  <Nav.Link as={Link} to="/gallery" className="fs-5">Gallery</Nav.Link>
+                  <Nav.Link as={Link} to="/feedback" className="fs-5">Feedback</Nav.Link>
+                  <Button as={Link} to="/register" variant="primary" className="ms-2">
                                 Register
                               </Button>
           </Nav>
