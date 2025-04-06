@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext"; 
+import { useAuth } from "../auth/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./CreateTrip.css"; 
+import "./CreateTrip.css";
 
 export default function TripPlanner() {
   const navigate = useNavigate();
@@ -17,7 +17,17 @@ export default function TripPlanner() {
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const interestOptions = ["Foods", "Beaches", "Cultural", "Gardens_and_Parks","Sport", "Museums","theatres_and_entertainments","Shops","historic"];
+  const interestOptions = [
+    "Foods",
+    "Beaches",
+    "Cultural",
+    "Gardens_and_Parks",
+    "Sport",
+    "Museums",
+    "theatres_and_entertainments",
+    "Shops",
+    "historic",
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,53 +42,98 @@ export default function TripPlanner() {
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/trips", tripData, {
+      const response = await axios.post(
+        "http://localhost:5000/api/trips",
+        tripData,
+        {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-  
+        }
+      );
+
       // After creating the trip, get the itinerary ID from the backend
-      const itineraryResponse = await axios.get(`http://localhost:5000/api/trips/${response.data._id}/itinerary/generate`, {
+      const itineraryResponse = await axios.post(
+        `http://localhost:5000/api/trips/${response.data._id}/itinerary/generate`,
+        {},
+        {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-  
+        }
+      );
+
       // Use the itinerary ID to navigate to the itinerary page
       navigate(`/itinerary/${itineraryResponse.data.itineraryId}`);
-  } catch (error) {
+    } catch (error) {
       console.error("Error creating trip:", error);
       alert("Failed to create trip. Please try again.");
-  } finally {
+    } finally {
       setLoading(false);
-  }
-  
+    }
   };
 
   return (
     <>
       {/* Navbar */}
-      <Navbar style={{ backgroundColor: "#D3D3D3" }} expand="lg" className="shadow-sm">
+      <Navbar
+        style={{ backgroundColor: "#D3D3D3" }}
+        expand="lg"
+        className="shadow-sm"
+      >
         <Container>
           <Navbar.Brand as={Link} to="/">
-            <img src="/logo.png" alt="TravelWorld Logo" width="50" height="50" className="me-2" />
+            <img
+              src="/logo.png"
+              alt="TravelWorld Logo"
+              width="50"
+              height="50"
+              className="me-2"
+            />
             <span className="travelworld-text">TravelWorld</span>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link as={Link} to="/">Home</Nav.Link>
-              <Nav.Link as={Link} to="/trip-planner">Trip Planner</Nav.Link>
-              <Nav.Link as={Link} to="/gallery">Gallery</Nav.Link>
-              <Nav.Link as={Link} to="/feedback">Feedback</Nav.Link>
+              <Nav.Link as={Link} to="/">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/trip-planner">
+                Trip Planner
+              </Nav.Link>
+              <Nav.Link as={Link} to="/gallery">
+                Gallery
+              </Nav.Link>
+              <Nav.Link as={Link} to="/feedback">
+                Feedback
+              </Nav.Link>
               {user ? (
                 <>
-                  <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                  <Button variant="outline-danger" onClick={logout} className="ms-2">
+                  <Nav.Link as={Link} to="/profile">
+                    Profile
+                  </Nav.Link>
+                  <Button
+                    variant="outline-danger"
+                    onClick={logout}
+                    className="ms-2"
+                  >
                     Logout
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button as={Link} to="/login" variant="outline-primary" className="ms-2">Login</Button>
-                  <Button as={Link} to="/register" variant="primary" className="ms-2">Register</Button>
+                  <Button
+                    as={Link}
+                    to="/login"
+                    variant="outline-primary"
+                    className="ms-2"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/register"
+                    variant="primary"
+                    className="ms-2"
+                  >
+                    Register
+                  </Button>
                 </>
               )}
             </Nav>
@@ -127,26 +182,27 @@ export default function TripPlanner() {
           />
 
           {/* Interests (Styled Pills) */}
-<label>Interests</label>
-<div className="interest-pills">
-  {interestOptions.map((interest) => (
-    <button
-      type="button"
-      key={interest}
-      className={`pill ${interests.includes(interest) ? "selected" : ""}`}
-      onClick={() =>
-        setInterests((prev) =>
-          prev.includes(interest)
-            ? prev.filter((i) => i !== interest)
-            : [...prev, interest]
-        )
-      }
-    >
-      {interest}
-    </button>
-  ))}
-</div>
-
+          <label>Interests</label>
+          <div className="interest-pills">
+            {interestOptions.map((interest) => (
+              <button
+                type="button"
+                key={interest}
+                className={`pill ${
+                  interests.includes(interest) ? "selected" : ""
+                }`}
+                onClick={() =>
+                  setInterests((prev) =>
+                    prev.includes(interest)
+                      ? prev.filter((i) => i !== interest)
+                      : [...prev, interest]
+                  )
+                }
+              >
+                {interest}
+              </button>
+            ))}
+          </div>
 
           {/* Submit Button */}
           <button type="submit" className="submit-button" disabled={loading}>

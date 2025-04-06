@@ -27,13 +27,14 @@ const ItineraryPage = () => {
     const fetchItinerary = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/trips/itinerary/${id}`,
+          `http://localhost:5000/api/trips/${id}/itinerary`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
+        console.log("🎯 Itinerary data received:", response.data); // <--- Add this
         setItinerary(response.data);
       } catch (error) {
         console.error("Error fetching itinerary:", error);
