@@ -31,7 +31,7 @@ export default function TripPlanner() {
       startDate,
       endDate,
       interests,
-      budget: Number(budget),
+      budget,
     };
 
     try {
@@ -147,13 +147,15 @@ export default function TripPlanner() {
           />
 
           {/* Budget Input */}
-          <label>Budget </label>
-          <input
-            type="number"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            required
-          />
+          <label>Budget:</label>
+<select name="budget" value={budget} onChange={(e) => setBudget(e.target.value)} required>
+  <option value="">Select Budget</option>
+  <option value="low">Low</option>
+  <option value="medium">Medium</option>
+  <option value="high">High</option>
+</select>
+
+
 
           {/* Interests (Styled Pills) */}
 <label>Interests</label>

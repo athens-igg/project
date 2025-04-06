@@ -38,7 +38,7 @@ const generateItinerary = async (req, res) => {
 const createItineraryFromTrip = async (req, res) => {
     try {
         const { id } = req.params;
-        const tripId = new mongoose.Types.ObjectId(id);  // ✅ Ensure tripId is an ObjectId
+        const tripId = new mongoose.Types.ObjectId(id);
 
         console.log(`Creating itinerary for tripId: ${tripId}`);
 
@@ -47,12 +47,11 @@ const createItineraryFromTrip = async (req, res) => {
             return res.status(404).json({ message: "Trip not found" });
         }
 
-        const { destination, startDate, endDate, interests } = trip;
-        if (!destination || !startDate || !endDate) {
+        const { destination, startDate, endDate, interests, budget } = trip;
+        if (!destination || !startDate || !endDate || !budget) {
             return res.status(400).json({ message: "Trip details are incomplete." });
         }
 
-        // Ensure the user is authenticated
         const userId = req.user.id;
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: No user found." });
@@ -67,23 +66,44 @@ const createItineraryFromTrip = async (req, res) => {
         const { lat, lon } = locationData;
         console.log("Fetching places for:", { lat, lon, interests });
 
-        // Fetch places based on interests
         let places = await fetchPlaces(lat, lon, interests);
+
         if (places.length < 5) {
             return res.status(404).json({ message: "Not enough places found." });
         }
 
-        // Structure the itinerary
+        // Apply budget filters
+        let placesPerDay = 5; // default
+
+        if (budget === "low") {
+            placesPerDay = 3;
+            places = places.filter(place =>
+                !place.properties.kinds.includes("shops") &&
+                !place.properties.kinds.includes("theatres_and_entertainments")
+            );
+        } else if (budget === "medium") {
+            placesPerDay = 4;
+            places = places.filter(place =>
+                !place.properties.kinds.includes("theatres_and_entertainments")
+            );
+        } else if (budget === "high") {
+            placesPerDay = 5; // No filter
+        }
+
+        if (places.length < placesPerDay) {
+            return res.status(404).json({ message: "Not enough suitable places found for the selected budget." });
+        }
+
+        // Structure itinerary
         const numDays = Math.max(1, Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)));
         const itinerary = {};
         for (let i = 0; i < numDays; i++) {
-            itinerary[`Day ${i + 1}`] = places.splice(0, 5);
+            itinerary[`Day ${i + 1}`] = places.splice(0, placesPerDay);
         }
 
-        // Save itinerary
         const savedItinerary = new Itinerary({
-            user: new mongoose.Types.ObjectId(userId), // ✅ Ensure ObjectId
-            trip: tripId, // ✅ Now stored correctly as ObjectId
+            user: new mongoose.Types.ObjectId(userId),
+            trip: tripId,
             destination,
             startDate,
             endDate,
@@ -91,13 +111,13 @@ const createItineraryFromTrip = async (req, res) => {
         });
         await savedItinerary.save();
 
-        // Step 1: Return the Itinerary ID after saving the itinerary
-        res.status(201).json({ itineraryId: savedItinerary._id });  // Returning the itinerary ID
+        res.status(201).json({ itineraryId: savedItinerary._id });
     } catch (error) {
         console.error("Error creating itinerary:", error);
         res.status(500).json({ message: "Failed to create itinerary." });
     }
 };
+
 
 /**
  * Sort places by distance from the first place

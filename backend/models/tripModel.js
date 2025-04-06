@@ -23,8 +23,9 @@ const tripSchema = new mongoose.Schema({
         required: true,
     },
     budget: {
-        type: Number,
-        required: true,
+        type: String,
+        enum: ["low", "medium", "high"],
+        required: true
     },
 }, { timestamps: true });
 
