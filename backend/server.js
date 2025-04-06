@@ -40,6 +40,7 @@ app.use("/api/destinations", require("./routes/destinationRoutes"));
 app.use("/api/trips", require("./routes/tripRoutes"));
 app.use("/api/feedback", require("./routes/feedbackRoutes"));
 app.use("/api/gallery", require("./routes/galleryRoutes"));
+app.use("/api/itineraries", require("./routes/itineraryRoutes"));
 app.use("/uploads", express.static("uploads")); // Serve uploaded images
 
 // Health Check
