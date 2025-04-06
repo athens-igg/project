@@ -24,7 +24,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post("http://localhost:5000/api/users/login", { email, password });
       const { token, user } = response.data; 
-      localStorage.setItem("user", JSON.stringify(user));
+  
+      localStorage.setItem("userInfo", JSON.stringify(user)); // ✅ Use correct key
       localStorage.setItem("token", token); // Store token
       
       setUser(user);
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }) => {
       alert("Invalid email or password"); // Show error to user
     }
   };
+  
 
   const logout = () => {
     localStorage.removeItem("user");

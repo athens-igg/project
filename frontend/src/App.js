@@ -12,6 +12,7 @@ import DestinationSearch from "./pages/DestinationSearch";
 import Gallery from "./pages/Gallery";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AdminDashboard from './pages/admin/AdminDashboard';
 import "./App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/destination-search" element={<DestinationSearch />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/gallery" element={<Gallery />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
             </Routes>
           </div>
           <Footer />
