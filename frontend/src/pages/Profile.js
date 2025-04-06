@@ -54,7 +54,17 @@ const Profile = () => {
           }
         );
 
-        setSavedItineraries(itinRes.data);
+        //setSavedItineraries(itinRes.data);
+        const uniqueItineraries = Array.from(
+          new Map(
+            itinRes.data.map((item) => [
+              `${item.destination}-${item.startDate}-${item.endDate}`,
+              item,
+            ])
+          ).values()
+        );
+        setSavedItineraries(uniqueItineraries);
+
         console.log("📦 Itineraries fetched:", itinRes.data);
       } catch (error) {
         console.error("🚨 Error fetching data:", error);
